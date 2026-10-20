@@ -6,6 +6,7 @@ export const QUICK_TEMPLATES: QuickTemplate[] = [
     label: 'Royal Wedding - 300 Guests',
     emoji: '💍',
     context: {
+      eventTitle: 'Aarav & Priya Grand Sangeet & Vivaha',
       eventType: 'wedding',
       guestCount: 300,
       totalBudget: 2500000, // ₹25 Lakhs
@@ -20,6 +21,7 @@ export const QUICK_TEMPLATES: QuickTemplate[] = [
     label: 'Milestone 30th Birthday - 50 Guests',
     emoji: '🎂',
     context: {
+      eventTitle: "Rohan's Retro Rooftop 30th Bash",
       eventType: 'birthday',
       guestCount: 50,
       totalBudget: 150000, // ₹1.5 Lakhs
@@ -34,6 +36,7 @@ export const QUICK_TEMPLATES: QuickTemplate[] = [
     label: 'Local Tech Community Meetup - 150 Guests',
     emoji: '💻',
     context: {
+      eventTitle: 'Hyderabad GenAI Developers Summit 2027',
       eventType: 'community',
       guestCount: 150,
       totalBudget: 200000, // ₹2 Lakhs

@@ -3,19 +3,28 @@ node_modules/
 .pnp
 .pnp.js
 
-# Next.js
+# Next.js & Builds
 .next/
 out/
 dist/
+build/
 
-# Environment
+# Environment files
 .env*
 
-# Testing
+# Testing & Coverage
 coverage/
 .vitest/
 
-# IDE
+# Heavy media / archives (Strict < 10 MB constraint)
+*.mp4
+*.zip
+*.tar.gz
+*.mov
+*.avi
+*.mkv
+
+# IDE & Editor
 .vscode/
 .idea/
 *.suo
@@ -23,7 +32,7 @@ coverage/
 *.njsproj
 *.sln
 
-# OS
+# OS metadata
 .DS_Store
 Thumbs.db
 

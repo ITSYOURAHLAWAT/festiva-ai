@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import type { EventPlan, VibeStudio, BudgetBreakdown } from '@/types';
-import { sanitizeInput } from '@/services/piiMasker';
+import { sanitizeInput, redactPII } from '@/services/security';
 import { rebalanceBudget } from '@/services/budgetMath';
 
 export async function POST(request: NextRequest) {

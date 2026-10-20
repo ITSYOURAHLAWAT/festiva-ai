@@ -7,21 +7,22 @@ describe('maskPII', () => {
     const masked = maskPII(text);
     expect(masked).not.toContain('planner@festiva.ai');
     expect(masked).not.toContain('test.user@gmail.com');
-    expect(masked).toContain('[EMAIL_REDACTED]');
+    expect(masked).toContain('[REDACTED]');
   });
 
   it('masks telephone and mobile numbers', () => {
-    const text = 'Call coordinator on +91 9876543210 or (555) 234-5678 immediately.';
+    const text = 'Call coordinator on +91 98765 43210 or 9876543210 immediately.';
     const masked = maskPII(text);
+    expect(masked).not.toContain('98765 43210');
     expect(masked).not.toContain('9876543210');
-    expect(masked).toContain('[PHONE_REDACTED]');
+    expect(masked).toContain('[REDACTED]');
   });
 
   it('masks Indian PAN cards', () => {
     const text = 'Tax identity: ABCDE1234F attached.';
     const masked = maskPII(text);
     expect(masked).not.toContain('ABCDE1234F');
-    expect(masked).toContain('[PAN_REDACTED]');
+    expect(masked).toContain('[REDACTED]');
   });
 });
 

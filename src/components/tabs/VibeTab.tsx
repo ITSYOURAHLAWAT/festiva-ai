@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   Sparkles, Palette, UtensilsCrossed, Music2, Mail,
-  Send, Loader2, ArrowRight, CheckCircle2, Copy, Check
+  Send, Loader2, ArrowRight, CheckCircle2, Copy, Check, AlertCircle
 } from 'lucide-react';
 import type { VibeStudio } from '@/types';
 
@@ -23,20 +23,47 @@ const DEMO_PROMPTS = [
 export function VibeTab({ vibe, onCoPilotInstruction, isCoPilotLoading }: VibeTabProps) {
   const [instruction, setInstruction] = useState('');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedInvite, setCopiedInvite] = useState(false);
 
   const handleCoPilotSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!instruction.trim() || isCoPilotLoading) return;
+    setErrorMessage(null);
+
+    const trimmed = instruction.trim();
+    if (!trimmed) {
+      setErrorMessage('Co-Pilot instruction cannot be empty. Please enter your requested modification.');
+      return;
+    }
+
+    if (trimmed.length < 5) {
+      setErrorMessage('Instruction is too brief. Please describe your desired change (e.g. "Switch menu to vegetarian").');
+      return;
+    }
+
+    if (trimmed.length > 300) {
+      setErrorMessage('Instruction cannot exceed 300 characters. Please provide a more concise command.');
+      return;
+    }
+
+    if (isCoPilotLoading) return;
+
     setStatusMessage('GenAI Co-Pilot is refining your event plan…');
     try {
-      await onCoPilotInstruction(instruction);
+      await onCoPilotInstruction(trimmed);
       setStatusMessage('Event plan successfully revised!');
       setInstruction('');
+      setErrorMessage(null);
       setTimeout(() => setStatusMessage(null), 3500);
     } catch {
-      setStatusMessage('Could not apply updates. Please try again.');
+      setStatusMessage(null);
+      setErrorMessage('Could not apply updates. Please try again or rephrase your request.');
     }
+  };
+
+  const handlePromptSelect = (promptText: string) => {
+    setInstruction(promptText);
+    setErrorMessage(null);
   };
 
   const handleCopyInvite = () => {
@@ -86,7 +113,7 @@ export function VibeTab({ vibe, onCoPilotInstruction, isCoPilotLoading }: VibeTa
             <button
               key={i}
               type="button"
-              onClick={() => setInstruction(promptText)}
+              onClick={() => handlePromptSelect(promptText)}
               className="text-xs px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-100 border border-white/10 transition-colors focus-visible:ring-4 focus-visible:ring-purple-400 text-left"
             >
               &ldquo;{promptText}&rdquo;
@@ -103,14 +130,23 @@ export function VibeTab({ vibe, onCoPilotInstruction, isCoPilotLoading }: VibeTa
             id="copilot-input"
             type="text"
             value={instruction}
-            onChange={(e) => setInstruction(e.target.value)}
+            onChange={(e) => {
+              setInstruction(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             disabled={isCoPilotLoading}
             placeholder='e.g. "Switch menu to 100% vegetarian North Indian and reduce decor budget by 15%"'
-            className="flex-1 px-4 py-3 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-purple-300/60 text-xs sm:text-sm focus:outline-none focus:border-pink-400 focus-visible:ring-4 focus-visible:ring-pink-400 disabled:opacity-50"
+            className={`flex-1 px-4 py-3 rounded-2xl bg-white/10 border text-white placeholder-purple-300/60 text-xs sm:text-sm focus:outline-none focus:visible:ring-4 disabled:opacity-50 ${
+              errorMessage
+                ? 'border-red-400 bg-red-950/30 focus:border-red-400 focus-visible:ring-red-400'
+                : 'border-white/20 focus:border-pink-400 focus-visible:ring-pink-400'
+            }`}
+            aria-invalid={!!errorMessage}
+            aria-describedby={errorMessage ? 'copilot-error-alert' : undefined}
           />
           <button
             type="submit"
-            disabled={isCoPilotLoading || !instruction.trim()}
+            disabled={isCoPilotLoading}
             className="px-5 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-amber-400 hover:opacity-90 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-4 focus-visible:ring-pink-400 flex-shrink-0"
             aria-label="Submit instruction to FestivaAI Co-Pilot"
           >
@@ -127,6 +163,19 @@ export function VibeTab({ vibe, onCoPilotInstruction, isCoPilotLoading }: VibeTa
             )}
           </button>
         </form>
+
+        {/* Inline High-Contrast Error Alert */}
+        {errorMessage && (
+          <div
+            id="copilot-error-alert"
+            role="alert"
+            aria-live="assertive"
+            className="flex items-center gap-2 text-xs font-bold text-red-300 bg-red-950/60 border border-red-500/80 p-2.5 rounded-xl animate-fade-in"
+          >
+            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" aria-hidden="true" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         {statusMessage && (
           <div

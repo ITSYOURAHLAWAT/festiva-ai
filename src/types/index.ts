@@ -26,6 +26,7 @@ export type CuisinePreference =
 
 // ── Event Context (user intake form) ─────────────────────────
 export interface EventContext {
+  eventTitle?: string;
   eventType: EventType;
   guestCount: number;
   totalBudget: number;
@@ -143,6 +144,7 @@ export interface EventPlan {
 
 // ── Form Validation Errors ───────────────────────────────────
 export interface FormErrors {
+  eventTitle?: string;
   eventType?: string;
   guestCount?: string;
   totalBudget?: string;

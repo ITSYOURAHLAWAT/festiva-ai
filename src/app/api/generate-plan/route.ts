@@ -3,11 +3,12 @@ import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 import type { EventContext, EventPlan } from '@/types';
 import { generateFallbackPlan } from '@/services/fallback';
-import { sanitizeInput } from '@/services/piiMasker';
+import { sanitizeInput, redactPII } from '@/services/security';
 import { EventPlanSchema } from '@/services/schemas';
 
 const RequestSchema = z.object({
   context: z.object({
+    eventTitle: z.string().max(120).optional(),
     eventType: z.enum(['wedding', 'birthday', 'community']),
     guestCount: z.number().int().min(1).max(10000),
     totalBudget: z.number().min(10000).max(100000000),

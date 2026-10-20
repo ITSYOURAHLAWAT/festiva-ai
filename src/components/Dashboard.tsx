@@ -133,7 +133,7 @@ export function Dashboard({
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black capitalize tracking-tight">
-              {plan.context.culturalTheme} Celebration in {plan.context.city}
+              {plan.context.eventTitle || `${plan.context.culturalTheme} Celebration in ${plan.context.city}`}
             </h1>
 
             <p className="text-xs sm:text-sm text-purple-200 line-clamp-1">

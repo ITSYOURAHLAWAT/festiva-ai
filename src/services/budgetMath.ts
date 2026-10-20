@@ -30,15 +30,15 @@ export function calculateBudgetBreakdown(context: EventContext): BudgetBreakdown
 
     let alert: string | undefined;
 
-    // Alert if venue is underfunded for guest count
+    // Alert if venue is underfunded for guest count (< ₹500/guest)
     if (template.name === 'Venue' && amountPerGuest < 500) {
       alert = `Venue budget (₹${amountPerGuest.toFixed(0)}/guest) may be tight. Consider community or outdoor venues.`;
     }
-    // Alert if catering is underfunded
+    // Alert if catering is underfunded (< ₹300/guest)
     if (template.name === 'Catering' && amountPerGuest < 300) {
       alert = `Catering at ₹${amountPerGuest.toFixed(0)}/guest is below standard minimums. Consider buffet or high-tea.`;
     }
-    // Alert if emergency buffer is too low
+    // Alert if emergency buffer is too low (< ₹5,000)
     if (template.name === 'Emergency Buffer' && amount < 5000) {
       alert = `Emergency buffer of ₹${amount.toLocaleString('en-IN')} is critically low. Recommended at least ₹5,000.`;
     }
@@ -86,31 +86,41 @@ export function rebalanceBudget(
   if (!targetCategory) return categories;
 
   const clampedNew = Math.max(targetCategory.minPercent, Math.min(80, newPercentage));
-  const oldPercentage = targetCategory.percentage;
-  const diff = clampedNew - oldPercentage;
+  const remainingBudgetShare = 100 - clampedNew;
 
-  if (diff === 0) return categories;
-
-  // Calculate total of other categories
+  // Calculate total percentage of all other categories
   const otherIndices = categories.map((_, i) => i).filter((i) => i !== changedIndex);
   const othersTotal = otherIndices.reduce((sum, i) => sum + categories[i].percentage, 0);
 
-  return categories.map((cat, i) => {
+  const updated = categories.map((cat, i) => {
     if (i === changedIndex) {
       const amount = Math.round((clampedNew / 100) * totalBudget);
       return { ...cat, percentage: clampedNew, amount };
     }
 
-    // Distribute reduction/increase proportionally across other categories
+    // Proportional distribution of the remaining budget share
     const share = othersTotal > 0 ? cat.percentage / othersTotal : 1 / otherIndices.length;
-    const rawPct = cat.percentage - diff * share;
+    const rawPct = remainingBudgetShare * share;
     const safePct = Math.max(cat.minPercent, Math.min(80, rawPct));
-    const amount = Math.round((safePct / 100) * totalBudget);
+    const roundedPct = Math.round(safePct * 10) / 10;
+    const amount = Math.round((roundedPct / 100) * totalBudget);
 
     return {
       ...cat,
-      percentage: Math.round(safePct * 10) / 10,
+      percentage: roundedPct,
       amount,
     };
   });
+
+  // Normalize rounding difference to ensure sum of all percentages is exactly 100%
+  const currentSum = updated.reduce((sum, c) => sum + c.percentage, 0);
+  const diffFrom100 = Math.round((100 - currentSum) * 10) / 10;
+
+  if (diffFrom100 !== 0 && otherIndices.length > 0) {
+    const adjustIdx = otherIndices[0];
+    updated[adjustIdx].percentage = Math.round((updated[adjustIdx].percentage + diffFrom100) * 10) / 10;
+    updated[adjustIdx].amount = Math.round((updated[adjustIdx].percentage / 100) * totalBudget);
+  }
+
+  return updated;
 }
