@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { redactPII, sanitizeInput, validateBudgetInput, validateGuestCountInput } from '@/services/security';
+import {
+  redactPII,
+  sanitizeInput,
+  validateBudgetInput,
+  validateGuestCountInput,
+  validateEventTitleInput,
+  validateEventDateInput,
+  validateCityInput,
+} from '@/services/security';
 
 describe('Security Service: PII Redaction', () => {
   it('masks single and multiple email addresses with [REDACTED]', () => {
@@ -108,5 +116,42 @@ describe('Security Service: Numerical Input Validation', () => {
     const valid = validateGuestCountInput(300);
     expect(valid.valid).toBe(true);
     expect(valid.error).toBeUndefined();
+  });
+
+  it('validates event titles and flags empty or single-character names', () => {
+    const empty = validateEventTitleInput('');
+    expect(empty.valid).toBe(false);
+    expect(empty.error).toContain('Event title is required');
+
+    const singleChar = validateEventTitleInput('A');
+    expect(singleChar.valid).toBe(false);
+    expect(singleChar.error).toContain('at least 2 characters');
+
+    const valid = validateEventTitleInput("Aarav & Meera's Wedding");
+    expect(valid.valid).toBe(true);
+  });
+
+  it('validates event dates and flags past dates with security errors', () => {
+    const past = validateEventDateInput('2020-01-01');
+    expect(past.valid).toBe(false);
+    expect(past.error).toContain('cannot be in the past');
+
+    const empty = validateEventDateInput('');
+    expect(empty.valid).toBe(false);
+    expect(empty.error).toContain('Event date is required');
+
+    const future = new Date();
+    future.setFullYear(future.getFullYear() + 1);
+    const valid = validateEventDateInput(future.toISOString().split('T')[0]);
+    expect(valid.valid).toBe(true);
+  });
+
+  it('validates city locations and flags missing or invalid values', () => {
+    const empty = validateCityInput('');
+    expect(empty.valid).toBe(false);
+    expect(empty.error).toContain('City or location is required');
+
+    const valid = validateCityInput('Udaipur');
+    expect(valid.valid).toBe(true);
   });
 });

@@ -230,7 +230,20 @@ export function generateFallbackPlan(context: EventContext, cacheKey: string): E
     vintage: { primary: '#831843', secondary: '#A16207', accent: '#475569', neutral: '#FDF2F8', name: 'Antique Bordeaux & Aged Brass' },
   };
 
-  const palette = colorPalettes[context.culturalTheme] || colorPalettes.royal;
+  const themeNormalized = ((): string => {
+    const raw = String(context.culturalTheme || '').toLowerCase();
+    if (raw.includes('royal')) return 'royal';
+    if (raw.includes('retro') || raw.includes('modern')) return 'modern';
+    if (raw.includes('minimal')) return 'minimalist';
+    if (raw.includes('bloom') || raw.includes('boho')) return 'boho';
+    if (raw.includes('gold') || raw.includes('vintage')) return 'vintage';
+    if (raw.includes('coastal') || raw.includes('tropical')) return 'tropical';
+    if (raw.includes('rustic') || raw.includes('desert')) return 'rustic';
+    if (raw.includes('traditional') || raw.includes('art deco')) return 'traditional';
+    return 'royal';
+  })();
+
+  const palette = colorPalettes[themeNormalized] || colorPalettes.royal;
 
   const menusByCuisine: Record<string, Array<{ course: string; items: string[]; dietaryNotes: string }>> = {
     'north-indian': [
@@ -255,7 +268,15 @@ export function generateFallbackPlan(context: EventContext, cacheKey: string): E
     ],
   };
 
-  const menu = menusByCuisine[context.cuisinePreference] || menusByCuisine.mixed;
+  const cuisineNormalized = ((): string => {
+    const raw = String(context.cuisinePreference || '').toLowerCase();
+    if (raw.includes('rajasthani') || raw.includes('north') || raw.includes('mughlai')) return 'north-indian';
+    if (raw.includes('south')) return 'south-indian';
+    if (raw.includes('vegan') || raw.includes('veg') || raw.includes('dessert')) return 'vegetarian';
+    return 'mixed';
+  })();
+
+  const menu = menusByCuisine[cuisineNormalized] || menusByCuisine.mixed;
 
   const invitationWording =
     context.eventType === 'wedding'

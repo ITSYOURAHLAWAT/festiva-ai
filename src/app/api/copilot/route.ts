@@ -22,7 +22,43 @@ export async function POST(request: NextRequest) {
       let updatedVibe: VibeStudio = { ...currentPlan.vibe };
       let updatedBudget: BudgetBreakdown = { ...currentPlan.budget };
 
-      if (lowerInstr.includes('vegetarian') || lowerInstr.includes('veg')) {
+      if (lowerInstr.includes('trim') || lowerInstr.includes('budget by 12') || lowerInstr.includes('reduce budget')) {
+        const factor = lowerInstr.includes('12') ? 0.88 : 0.9;
+        const newTotal = Math.round(updatedBudget.totalBudget * factor);
+        updatedBudget = {
+          ...updatedBudget,
+          totalBudget: newTotal,
+          perGuestCost: Math.round(newTotal / (currentPlan.context.guestCount || 1)),
+          categories: updatedBudget.categories.map((c) => ({
+            ...c,
+            amount: Math.round((c.percentage / 100) * newTotal),
+          })),
+        };
+      }
+
+      if (lowerInstr.includes('sangeet')) {
+        updatedVibe = {
+          ...updatedVibe,
+          ambiance: 'Vibrant Sangeet celebration with dazzling festive fairy lights, traditional Dhol drummers, and a high-energy LED dance floor.',
+          musicSuggestions: [
+            'Live Dhol entrance beats',
+            'Choreographed family Sangeet dance medley',
+            'Bollywood DJ chartbusters & Punjabi folk remix for open floor',
+          ],
+        };
+      }
+
+      if (lowerInstr.includes('vegan')) {
+        updatedVibe = {
+          ...updatedVibe,
+          menuSuggestions: [
+            { course: 'Welcome Refreshers', items: ['Fresh Tender Coconut', 'Mint Panna Cooler', 'Hibiscus Iced Brew'], dietaryNotes: '100% Plant-Based Certified' },
+            { course: 'Vegan Gourmet Starters', items: ['Crispy Lotus Stem in Jaggery-Chili', 'Tofu & Bell Pepper Tikka', 'Truffle-Infused Mushroom Kebabs'], dietaryNotes: 'Cruelty-Free Vegan' },
+            { course: 'Main Course', items: ['Coconut Milk Yellow Curry', 'Slow-Simmered Black Lentil Dal', 'Wild Mushroom Biryani', 'Gluten-Free Millet Rotis'], dietaryNotes: 'Vegan & Dairy-Free' },
+            { course: 'Artisanal Desserts', items: ['Almond Milk Kheer with Pistachio', 'Dark Chocolate Avocado Mousse', 'Mango Sorbet'], dietaryNotes: 'Zero Dairy, Pure Vegan' },
+          ],
+        };
+      } else if (lowerInstr.includes('vegetarian') || lowerInstr.includes('veg')) {
         updatedVibe = {
           ...updatedVibe,
           menuSuggestions: [

@@ -12,7 +12,16 @@ export type ThemePreference =
   | 'traditional'
   | 'minimalist'
   | 'tropical'
-  | 'vintage';
+  | 'vintage'
+  | 'Royal Heritage'
+  | 'Neon Retro'
+  | 'Minimal Luxe'
+  | 'Garden Bloom'
+  | 'Midnight Gold'
+  | 'Coastal Breeze'
+  | 'Boho Desert'
+  | 'Art Deco'
+  | string;
 
 export type CuisinePreference =
   | 'vegetarian'
@@ -22,7 +31,15 @@ export type CuisinePreference =
   | 'north-indian'
   | 'south-indian'
   | 'continental'
-  | 'fusion';
+  | 'fusion'
+  | 'Rajasthani'
+  | 'Fusion Tapas'
+  | 'South Indian'
+  | 'Pan-Asian'
+  | 'Mughlai'
+  | 'Vegan Garden'
+  | 'Dessert Bar'
+  | string;
 
 // ── Event Context (user intake form) ─────────────────────────
 export interface EventContext {

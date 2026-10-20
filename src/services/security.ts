@@ -65,3 +65,60 @@ export function validateGuestCountInput(guests: number | string): { valid: boole
   if (num > 10000) return { valid: false, error: 'Maximum guest count capacity is 10,000 attendees.' };
   return { valid: true };
 }
+
+/**
+ * Security validation helper for event title/name
+ */
+export function validateEventTitleInput(title: string): { valid: boolean; error?: string } {
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return { valid: false, error: 'Event title is required.' };
+  }
+  if (title.trim().length < 2) {
+    return { valid: false, error: 'Event title must be at least 2 characters long.' };
+  }
+  if (title.length > 150) {
+    return { valid: false, error: 'Event title cannot exceed 150 characters.' };
+  }
+  return { valid: true };
+}
+
+/**
+ * Security validation helper for event date (enforcing future date)
+ */
+export function validateEventDateInput(dateStr: string): { valid: boolean; error?: string } {
+  if (!dateStr || typeof dateStr !== 'string' || !dateStr.trim()) {
+    return { valid: false, error: 'Event date is required.' };
+  }
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) {
+    return { valid: false, error: 'Invalid date format.' };
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (date < today) {
+    return { valid: false, error: 'Event date cannot be in the past.' };
+  }
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() + 5);
+  if (date > maxDate) {
+    return { valid: false, error: 'Event date cannot be more than 5 years in the future.' };
+  }
+  return { valid: true };
+}
+
+/**
+ * Security validation helper for event city / location
+ */
+export function validateCityInput(city: string): { valid: boolean; error?: string } {
+  if (!city || typeof city !== 'string' || !city.trim()) {
+    return { valid: false, error: 'City or location is required.' };
+  }
+  if (city.trim().length < 2) {
+    return { valid: false, error: 'City name must be at least 2 characters.' };
+  }
+  if (city.length > 100) {
+    return { valid: false, error: 'City name cannot exceed 100 characters.' };
+  }
+  return { valid: true };
+}
+

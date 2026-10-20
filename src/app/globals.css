@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
+  --background: #FAF8F5;
   --foreground: #0f172a;
 }
 
 html.dark {
-  --background: #090d16;
+  --background: #06080F;
   --foreground: #f8fafc;
 }
 
@@ -27,7 +27,7 @@ body {
 
 /* Custom Range Input */
 input[type='range'] {
-  accent-color: #9333ea;
+  accent-color: #8b5cf6;
 }
 
 /* Custom Scrollbar */
@@ -39,7 +39,7 @@ input[type='range'] {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #9333ea;
+  background: #8b5cf6;
   border-radius: 9999px;
 }
 
