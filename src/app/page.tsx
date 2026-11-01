@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { EventContext, EventPlan } from '@/types';
 import { getCacheKey, getCachedPlan, setCachedPlan } from '@/services/cache';
 import { generateFallbackPlan } from '@/services/fallback';
+import { parseCoPilotInstruction } from '@/services/copilotParser';
 import { Navbar } from '@/components/Navbar';
 import { ConfigStudio } from '@/components/ConfigStudio';
 import { CommandCenter } from '@/components/CommandCenter';
@@ -86,6 +87,18 @@ export default function HomePage() {
     setPlan((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
+  // Full context+plan sync triggered by Co-Pilot context changes
+  const handleContextAndPlanUpdate = useCallback(
+    (newContext: EventContext, planUpdates: Partial<EventPlan>) => {
+      setContext(newContext);
+      const key = getCacheKey(newContext);
+      const refreshedPlan = generateFallbackPlan(newContext, key);
+      // Merge Co-Pilot vibe/budget overrides on top of the freshly generated plan
+      setPlan({ ...refreshedPlan, ...planUpdates });
+    },
+    []
+  );
+
   const handleReset = useCallback(() => {
     setContext(DEFAULT_CONTEXT);
     const key = getCacheKey(DEFAULT_CONTEXT);
@@ -156,7 +169,7 @@ export default function HomePage() {
         currentPlan={plan}
         currentContext={context}
         onPlanUpdate={handlePlanUpdate}
-        onContextUpdate={setContext}
+        onContextAndPlanUpdate={handleContextAndPlanUpdate}
       />
     </div>
   );
@@ -166,18 +179,20 @@ interface CoPilotBarProps {
   currentPlan: EventPlan | null;
   currentContext: EventContext;
   onPlanUpdate: (updates: Partial<EventPlan>) => void;
-  onContextUpdate: (updates: EventContext) => void;
+  onContextAndPlanUpdate: (newContext: EventContext, planUpdates: Partial<EventPlan>) => void;
 }
 
-function CoPilotBar({ currentPlan, currentContext, onPlanUpdate, onContextUpdate }: CoPilotBarProps) {
+function CoPilotBar({ currentPlan, currentContext, onPlanUpdate, onContextAndPlanUpdate }: CoPilotBarProps) {
   const [value, setValue] = useState('');
   const [reply, setReply] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
 
   const suggestions = [
+    'Change to tech event',
+    'Theme: Boho Desert',
+    'Cuisine: Pan-Asian',
+    'Budget: 4 Crore',
     'Trim budget by 12%',
-    'Add a sangeet night',
-    'Find vegan vendors',
   ];
 
   const handleSend = async (text: string) => {
@@ -186,49 +201,49 @@ function CoPilotBar({ currentPlan, currentContext, onPlanUpdate, onContextUpdate
     setValue('');
     setIsSending(true);
 
+    // ── 1. Smart NLP parsing of context-level changes ────────────────────────
+    const { patch: parsedPatch, descriptions } = parseCoPilotInstruction(query, currentContext);
+    let newContext: EventContext = { ...currentContext, ...parsedPatch };
+
+    // ── 2. Call the Co-Pilot API for server-side vibe/budget updates ──────────
     try {
+      const planToSend = currentPlan || generateFallbackPlan(currentContext, 'copilot_temp');
       const response = await fetch('/api/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          currentPlan: currentPlan || generateFallbackPlan(currentContext, 'copilot_temp'),
+          currentPlan: { ...planToSend, context: newContext },
           userInstruction: query,
         }),
       });
 
-      if (response.ok) {
-        const updates = (await response.json()) as Partial<EventPlan>;
-        onPlanUpdate(updates);
+      const apiUpdates: Partial<EventPlan> = response.ok ? (await response.json()) as Partial<EventPlan> : {};
 
-        if (updates.budget?.totalBudget) {
-          onContextUpdate({
-            ...currentContext,
-            totalBudget: updates.budget.totalBudget,
-          });
-        }
+      // If the API returned a totalBudget override and we didn't explicitly parse one
+      if (apiUpdates.budget?.totalBudget && !parsedPatch.totalBudget) {
+        newContext = { ...newContext, totalBudget: apiUpdates.budget.totalBudget };
+        descriptions.push(`Budget rebalanced`);
+      }
 
-        if (query.toLowerCase().includes('trim') || query.toLowerCase().includes('budget')) {
-          setReply(
-            `Co-Pilot: I've rebalanced your budget by trimming 12% across flexible categories while protecting your core venue deposit.`
-          );
-        } else if (query.toLowerCase().includes('sangeet')) {
-          setReply(
-            `Co-Pilot: Added a vibrant Sangeet celebration night with LED dance floor acoustics and choreographed playlist!`
-          );
-        } else if (query.toLowerCase().includes('vegan')) {
-          setReply(
-            `Co-Pilot: Updated your menu gallery with 100% plant-based certified catering options and cruelty-free vendor checklists.`
-          );
-        } else {
-          setReply(
-            `Co-Pilot: I've adapted your event plan for "${query}". Your budget and vendor checkpoints have been refreshed.`
-          );
-        }
+      // Sync context + regenerate entire plan with updated theme/cuisine/milestones + merge overrides
+      onContextAndPlanUpdate(newContext, apiUpdates);
+
+      // Friendly human-readable response
+      if (descriptions.length > 0) {
+        setReply(`Co-Pilot: Updated your plan — ${descriptions.join(', ')}. All cards & menus refreshed!`);
+      } else if (query.toLowerCase().includes('sangeet')) {
+        setReply(`Co-Pilot: Added a vibrant Sangeet celebration night with LED dance floor acoustics and Dhol drummers!`);
       } else {
-        setReply(`Co-Pilot: Adapted plan for "${query}". Rebalanced budget and notified relevant vendor categories.`);
+        setReply(`Co-Pilot: Adapted your plan for "${query}". Event blueprint and vendor checkpoints refreshed.`);
       }
     } catch {
-      setReply(`Co-Pilot: Received "${query}". Applied dynamic event adjustments.`);
+      // Offline fallback: still apply parsed context changes immediately
+      onContextAndPlanUpdate(newContext, {});
+      setReply(
+        descriptions.length > 0
+          ? `Co-Pilot: Applied — ${descriptions.join(', ')}. (Offline mode)`
+          : `Co-Pilot: Adapted your plan for "${query}". (Offline mode)`
+      );
     } finally {
       setIsSending(false);
     }

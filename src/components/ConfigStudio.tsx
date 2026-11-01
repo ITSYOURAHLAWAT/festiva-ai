@@ -110,6 +110,20 @@ export function ConfigStudio({
     setMounted(true);
   }, []);
 
+  // Sync active persona pill with context.eventType changes (e.g. from AI Co-Pilot)
+  useEffect(() => {
+    if (context.eventType === 'wedding') {
+      setActivePersona('Royal Wedding');
+      setIsEdgeCase(false);
+    } else if (context.eventType === 'birthday') {
+      setActivePersona('30th Milestone');
+      setIsEdgeCase(false);
+    } else if (context.eventType === 'community') {
+      setActivePersona('Tech Meetup');
+      setIsEdgeCase(false);
+    }
+  }, [context.eventType]);
+
   // Compute live validation errors for high-impact edge-case testing
   const titleValidation = validateEventTitleInput(context.eventTitle || '');
   const budgetValidation = validateBudgetInput(context.totalBudget);

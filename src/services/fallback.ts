@@ -221,62 +221,95 @@ export function generateFallbackPlan(context: EventContext, cacheKey: string): E
 
   const colorPalettes: Record<string, { primary: string; secondary: string; accent: string; neutral: string; name: string }> = {
     royal: { primary: '#6B21A8', secondary: '#B45309', accent: '#F59E0B', neutral: '#FAF5FF', name: 'Regal Velvet & Marigold Gold' },
-    rustic: { primary: '#78350F', secondary: '#15803D', accent: '#D97706', neutral: '#FFFBEB', name: 'Earthy Terracotta & Forest Olive' },
-    modern: { primary: '#0F172A', secondary: '#6366F1', accent: '#EC4899', neutral: '#F8FAFC', name: 'Neo-Midnight & Neon Magenta' },
-    boho: { primary: '#9A3412', secondary: '#D97706', accent: '#E11D48', neutral: '#FFF7ED', name: 'Desert Sunset & Pampas Rose' },
-    traditional: { primary: '#991B1B', secondary: '#D97706', accent: '#047857', neutral: '#FEF2F2', name: 'Auspicious Crimson, Saffron & Emerald' },
-    minimalist: { primary: '#1E293B', secondary: '#64748B', accent: '#0EA5E9', neutral: '#F1F5F9', name: 'Monochrome Slate & Nordic Cyan' },
-    tropical: { primary: '#047857', secondary: '#0284C7', accent: '#F59E0B', neutral: '#ECFDF5', name: 'Amazonian Palm & Coral Hibiscus' },
-    vintage: { primary: '#831843', secondary: '#A16207', accent: '#475569', neutral: '#FDF2F8', name: 'Antique Bordeaux & Aged Brass' },
+    retro: { primary: '#0F172A', secondary: '#6366F1', accent: '#EC4899', neutral: '#F8FAFC', name: 'Neo-Midnight & Neon Magenta' },
+    minimal: { primary: '#1E293B', secondary: '#64748B', accent: '#0EA5E9', neutral: '#F1F5F9', name: 'Monochrome Slate & Nordic Cyan' },
+    bloom: { primary: '#15803D', secondary: '#DB2777', accent: '#F43F5E', neutral: '#FDF2F8', name: 'Blush Peony & Botanical Sage' },
+    gold: { primary: '#0F172A', secondary: '#D97706', accent: '#FBBF24', neutral: '#FFFBEB', name: 'Midnight Navy & Champagne Gold' },
+    coastal: { primary: '#0284C7', secondary: '#0D9488', accent: '#FB7185', neutral: '#F0FDFA', name: 'Aegean Ocean & Sun-Drenched Coral' },
+    boho: { primary: '#9A3412', secondary: '#D97706', accent: '#E11D48', neutral: '#FFF7ED', name: 'Desert Terracotta & Pampas Amber' },
+    deco: { primary: '#18181B', secondary: '#B45309', accent: '#CA8A04', neutral: '#FEFCE8', name: 'Gilded Obsidian & Antique Brass' },
   };
 
   const themeNormalized = ((): string => {
     const raw = String(context.culturalTheme || '').toLowerCase();
     if (raw.includes('royal')) return 'royal';
-    if (raw.includes('retro') || raw.includes('modern')) return 'modern';
-    if (raw.includes('minimal')) return 'minimalist';
-    if (raw.includes('bloom') || raw.includes('boho')) return 'boho';
-    if (raw.includes('gold') || raw.includes('vintage')) return 'vintage';
-    if (raw.includes('coastal') || raw.includes('tropical')) return 'tropical';
-    if (raw.includes('rustic') || raw.includes('desert')) return 'rustic';
-    if (raw.includes('traditional') || raw.includes('art deco')) return 'traditional';
+    if (raw.includes('retro') || raw.includes('neon')) return 'retro';
+    if (raw.includes('minimal')) return 'minimal';
+    if (raw.includes('bloom') || raw.includes('garden') || raw.includes('floral')) return 'bloom';
+    if (raw.includes('gold') || raw.includes('midnight')) return 'gold';
+    if (raw.includes('coastal') || raw.includes('breeze') || raw.includes('beach') || raw.includes('tropical')) return 'coastal';
+    if (raw.includes('boho') || raw.includes('desert') || raw.includes('rustic')) return 'boho';
+    if (raw.includes('art deco') || raw.includes('deco') || raw.includes('vintage')) return 'deco';
     return 'royal';
   })();
 
   const palette = colorPalettes[themeNormalized] || colorPalettes.royal;
 
   const menusByCuisine: Record<string, Array<{ course: string; items: string[]; dietaryNotes: string }>> = {
-    'north-indian': [
-      { course: 'Welcome Beverages & Street Starters', items: ['Kesaria Thandai', 'Dahi Bhalla Shots', 'Amritsari Paneer Tikka', 'Tandoori Broccoli'], dietaryNotes: '100% Vegetarian options curated' },
-      { course: 'Royal Main Course', items: ['Dal Makhani Simmered 24hrs', 'Shahi Paneer Lababdar', 'Subz Dum Biryani', 'Assorted Chur Chur Naans & Tandoori Rotis'], dietaryNotes: 'Rich, authentic regional gravies' },
-      { course: 'Dessert Extravaganza', items: ['Hot Jalebi with Rabri', 'Gulab Jamun Flambé', 'Kesar Pista Kulfi'], dietaryNotes: 'Contains milk/dry fruits' },
+    rajasthani: [
+      { course: 'Royal Welcoming Sips', items: ['Kesaria Thandai with Pistachio Flakes', 'Rose Gulab Sharbat', 'Smoked Aam Panna Cooler'], dietaryNotes: 'Traditional heritage cooling drinks' },
+      { course: 'Crisp Palace Starters', items: ['Mini Dal Kachori with Mint Chutney', 'Jodhpur Mirchi Vada', 'Smoked Paneer Tikka in Mathania Chilis'], dietaryNotes: 'Authentic Marwari spice heritage' },
+      { course: 'The Maharaja Thali', items: ['Dal Baati Churma with Pure Desi Ghee', 'Traditional Gatte Ki Sabzi', 'Ker Sangri Dry Roast', 'Bajra Roti with White Butter'], dietaryNotes: 'Iconic royal Rajasthani feast' },
+      { course: 'Heritage Sweet Ending', items: ['Malpua with Pistachio Rabri', 'Bikaneri Saffron Ghevar', 'Hot Moong Dal Halwa'], dietaryNotes: 'Pure ghee artisanal confections' },
+    ],
+    continental: [
+      { course: 'Aperitifs & Amuse-Bouche', items: ['Elderflower Fizz', 'Wild Mushroom Truffle Crostini', 'Bocconcini & Heirloom Cherry Tomato Skewers'], dietaryNotes: 'Gourmet vegetarian European start' },
+      { course: 'Artisanal Starters', items: ['Herb-Crusted Brie Bites with Fig Jam', 'Crisp Asparagus Tempura', 'Roasted Butternut Squash Velouté'], dietaryNotes: 'Modern bistro styling' },
+      { course: 'European Main Course', items: ['Wild Porcini Risotto with Parmesan Crisp', 'Charred Polenta Cake with Ratatouille', 'Handmade Spinach Ricotta Ravioli in Sage Butter'], dietaryNotes: 'Rustic Mediterranean culinary roots' },
+      { course: 'Patisserie Desserts', items: ['Classic Madagascar Vanilla Crème Brûlée', 'Dark Chocolate Raspberry Ganache Tart', 'Limoncello Sorbet'], dietaryNotes: 'Artisanal pastry kitchen finish' },
+    ],
+    fusion: [
+      { course: 'Avant-Garde Beverages', items: ['Kokum & Lemongrass Spritzer', 'Chili Guava Margarita Shots', 'Nitro Saffron Chai Elixir'], dietaryNotes: 'Modern mixology concepts' },
+      { course: 'Global Tapas', items: ['Wasabi Edamame Sev Puri Shots', 'Paneer Tikka Bao Buns with Kimchi', 'Truffle-Infused Kulcha Sliders', 'Avocado Dahi Puri'], dietaryNotes: 'Bold east-meets-west pairings' },
+      { course: 'Progressive Mains', items: ['Dal Makhani Pot Pie with Flaky Puff Pastry', 'Smoked Cottage Cheese Cannelloni in Makhani Glaze', 'Wild Mushroom Biryani Arancini Balls'], dietaryNotes: 'Contemporary culinary theater' },
+      { course: 'Deconstructed Sweets', items: ['Rasmalai Tres Leches Cake', 'Gulab Jamun Churros with Cardamom Glaze', 'Paan Leaf Cotton Candy'], dietaryNotes: 'Playful modernist reinterpretations' },
     ],
     'south-indian': [
-      { course: 'Welcome Refreshments', items: ['Elaneer Payasam Cooler', 'Guntur Podi Idli Bites', 'Mysore Bonda with Coconut Chutneys'], dietaryNotes: 'Fresh coconut and gluten-sensitive' },
-      { course: 'Traditional Sadhya / Feast', items: ['Avial', 'Bisibelebath with Boondi', 'Parippu Curry with Ghee', 'Malabar Parotta with Veg Kurma'], dietaryNotes: 'Rich in traditional spices' },
-      { course: 'Sweet Finish', items: ['Ada Pradhaman', 'Filter Coffee Ice Cream', 'Mysore Pak Cubes'], dietaryNotes: 'Authentic jaggery and ghee' },
+      { course: 'Coastal Welcome', items: ['Tender Coconut Elaneer Payasam Cooler', 'Kokum Ginger Fizz', 'Fresh Filter Coffee Slush'], dietaryNotes: 'Refreshing natural electrolytes' },
+      { course: 'Crunchy Tiffin Starters', items: ['Guntur Ghee Podi Mini Idlis', 'Crisp Mysore Masala Vada with Coconut Chutney', 'Chettinad Spiced Paneer Skewers'], dietaryNotes: 'Stone-ground heritage spices' },
+      { course: 'The Grand Sadhya', items: ['Traditional Avial with Cold-Pressed Coconut Oil', 'Bisibelebath with Crisp Khara Boondi', 'Parippu Curry with Cow Ghee', 'Flaky Malabar Parotta with Veg Kurma'], dietaryNotes: 'Authentic banana leaf dining tradition' },
+      { course: 'Temple Sweets', items: ['Ada Pradhaman in Jaggery & Coconut Milk', 'Melt-in-mouth Ghee Mysore Pak', 'Filter Coffee Bean Gelato'], dietaryNotes: 'Jaggery and cold-pressed coconut notes' },
     ],
-    vegetarian: [
-      { course: 'Artisanal Starters', items: ['Crispy Lotus Stem in Sweet Chili', 'Smoked Paneer Skewers', 'Stuffed Wild Mushroom Crostini'], dietaryNotes: 'Pure vegetarian & crisp' },
-      { course: 'Wholesome Mains', items: ['Sun-dried Tomato Risotto or Paneer Tikka Masala', 'Charred Garden Greens', 'Saffron Pulao'], dietaryNotes: 'Farm-fresh and balanced' },
-      { course: 'Desserts', items: ['Belgian Dark Chocolate Mousse', 'Baked Rasgulla', 'Berry Panna Cotta'], dietaryNotes: 'Vegetarian gelatin alternatives used' },
+    asian: [
+      { course: 'Dim Sum & Sips', items: ['Lychee Jasmine Iced Tea', 'Crystal Truffle Edamame Dimsums', 'Spicy Sichuan Wontons with Chili Oil Crisp'], dietaryNotes: 'Delicate bamboo steamed baskets' },
+      { course: 'Wok-Fired Starters', items: ['Crispy Lotus Stem in Honey-Chili Glaze', 'Thai Basil Tofu Skewers', 'Salt & Pepper Wild Forest Mushrooms'], dietaryNotes: 'High-heat wok flame aroma' },
+      { course: 'Imperial Mains', items: ['Aromatic Thai Green Curry with Kaffir Lime', 'Fragrant Jasmine Rice Bowl', 'Pan-Fried Chili Garlic Hand-Pulled Noodles', 'Steamed Asian Greens in Soy-Sesame'], dietaryNotes: 'Balanced sweet, sour, salty & umami' },
+      { course: 'Far-East Desserts', items: ['Warm Mango Coconut Sticky Rice', 'Matcha Green Tea Crepe Cake', 'Toasted Sesame Ice Cream'], dietaryNotes: 'Subtle natural sweetness' },
     ],
-    mixed: [
-      { course: 'Appetizers (Veg & Non-Veg)', items: ['Bhatti Murgh Tikka', 'Crispy Corn & Water Chestnut', 'Fish Amritsari', 'Tandoori Malai Soya Chaap'], dietaryNotes: 'Clear color-coded serving platters' },
-      { course: 'Signature Mains', items: ['Slow-cooked Dum Butter Chicken', 'Dal Bukhara', 'Kashmiri Mutton Rogan Josh or Paneer Pasanda', 'Zaffrani Biryani with Burani Raita'], dietaryNotes: 'Dual kitchen live buffet' },
-      { course: 'Dessert Bar', items: ['Molten Chocolate Fondant', 'Warm Moong Dal Halwa', 'Vanilla Bean Gelato'], dietaryNotes: 'Comprehensive crowd favorites' },
+    mughlai: [
+      { course: 'Dastarkhwan Welcome', items: ['Khas Sharbat with Silver Leaf', 'Zafrani Badam Milk', 'Rose Mint Cooler'], dietaryNotes: 'Nawabi royal court welcome' },
+      { course: 'Charcoal Kebabs', items: ['Melt-in-Mouth Galouti Kebab on Sheermal', 'Tandoori Malai Soya Chaap', 'Amritsari Paneer Tikka with Pudina Chutney'], dietaryNotes: 'Clay oven charcoal slow smoked' },
+      { course: 'Shahi Dastarkhwan', items: ['Slow-Cooked Dal Bukhara Simmered 24hrs', 'Shahi Paneer Lababdar in Cashew Gravy', 'Dum Pukht Awadhi Subz Biryani with Burani Raita', 'Taftan & Garlic Roghani Naans'], dietaryNotes: 'Rich simmered bone-dry spice extracts' },
+      { course: 'Royal Meetha', items: ['Shahi Tukda with Gold Vark & Rabri', 'Kashmiri Phirni in Clay Pots', 'Angoori Gulab Jamun Flambé'], dietaryNotes: 'Saffron and Kewra scented classics' },
+    ],
+    vegan: [
+      { course: 'Welcome Botanical Refreshers', items: ['Cold-Pressed Tender Coconut Spritz', 'Mint-Cucumber Panna Cooler', 'Hibiscus Berry Iced Brew'], dietaryNotes: '100% Plant-Based Certified' },
+      { course: 'Gourmet Garden Starters', items: ['Crispy Lotus Stem with Tamarind-Chili Glaze', 'Tofu & Charred Bell Pepper Tikka', 'Truffle-Infused Wild Mushroom Kebabs'], dietaryNotes: 'Zero Dairy, Pure Vegan' },
+      { course: 'Wholesome Harvest Mains', items: ['Coconut Milk Golden Vegetable Curry', 'Slow-Simmered Black Dal without Dairy', 'Wild Mushroom & Edamame Dum Biryani', 'Ancient Grain Millet Rotis'], dietaryNotes: 'Rich, satiating plant protein' },
+      { course: 'Cruelty-Free Sweets', items: ['Almond Milk Saffron Kheer', 'Dark Belgian Chocolate Avocado Mousse', 'Fresh Alphonso Mango Sorbet'], dietaryNotes: 'Dairy-free ethical celebration' },
+    ],
+    dessert: [
+      { course: 'Sweet Sparkling Aperitifs', items: ['Sparkling Berry Spritz with Fresh Mint', 'White Chocolate Vanilla Milkshake', 'Iced Mocha Shot'], dietaryNotes: 'Decadent sweet welcoming' },
+      { course: 'Live Creperie & Waffle Bar', items: ['Belgian Sugar Waffles with Caramel Glaze', 'Fresh French Crêpes with Nutella & Strawberries', 'Mini Churro Cones with Dulce de Leche'], dietaryNotes: 'Live chef dessert performance station' },
+      { course: 'Grand Patisserie Buffet', items: ['Warm Molten Lava Chocolate Fondant', 'Opera Gateau with Coffee Ganache', 'Assorted Parisian Macarons (Raspberry, Pistachio, Salted Caramel)'], dietaryNotes: 'Master pastry showcase' },
+      { course: 'Artisanal Gelato & Mithai Bar', items: ['Liquid Nitrogen Kesar Pista Ice Cream', 'Hot Malpua with Rabri Shots', 'Artisanal Baked Gulab Jamun Tartlets'], dietaryNotes: 'Indulgent finale' },
     ],
   };
 
   const cuisineNormalized = ((): string => {
     const raw = String(context.cuisinePreference || '').toLowerCase();
-    if (raw.includes('rajasthani') || raw.includes('north') || raw.includes('mughlai')) return 'north-indian';
+    if (raw.includes('rajasthani')) return 'rajasthani';
+    if (raw.includes('continental')) return 'continental';
+    if (raw.includes('fusion') || raw.includes('tapas')) return 'fusion';
     if (raw.includes('south')) return 'south-indian';
-    if (raw.includes('vegan') || raw.includes('veg') || raw.includes('dessert')) return 'vegetarian';
-    return 'mixed';
+    if (raw.includes('pan-asian') || raw.includes('asian') || raw.includes('chinese') || raw.includes('thai')) return 'asian';
+    if (raw.includes('mughlai') || raw.includes('north')) return 'mughlai';
+    if (raw.includes('vegan') || raw.includes('plant')) return 'vegan';
+    if (raw.includes('dessert') || raw.includes('sweet')) return 'dessert';
+    return 'fusion';
   })();
 
-  const menu = menusByCuisine[cuisineNormalized] || menusByCuisine.mixed;
+  const menu = menusByCuisine[cuisineNormalized] || menusByCuisine.fusion;
 
   const invitationWording =
     context.eventType === 'wedding'
