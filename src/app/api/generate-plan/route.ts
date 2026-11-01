@@ -14,9 +14,9 @@ const RequestSchema = z.object({
     totalBudget: z.number().min(10000).max(100000000),
     eventDate: z.string().min(1),
     city: z.string().min(2).max(100),
-    culturalTheme: z.enum(['royal', 'rustic', 'modern', 'boho', 'traditional', 'minimalist', 'tropical', 'vintage']),
-    cuisinePreference: z.enum(['vegetarian', 'vegan', 'non-vegetarian', 'mixed', 'north-indian', 'south-indian', 'continental', 'fusion']),
-    additionalNotes: z.string().max(500),
+    culturalTheme: z.string().min(1).max(100),
+    cuisinePreference: z.string().min(1).max(100),
+    additionalNotes: z.string().max(500).optional().default(''),
   }),
   cacheKey: z.string().min(1),
 });
