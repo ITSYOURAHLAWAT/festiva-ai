@@ -5,6 +5,13 @@
 
 ---
 
+## 🚀 Live Demo Deployment
+
+Explore the fully deployed, interactive production application here:  
+👉 **[https://festiva-ai-one.vercel.app/](https://festiva-ai-one.vercel.app/)**
+
+---
+
 ## 1. Chosen Vertical: Celebration & Event Planner (Weddings, Birthdays, Community Events)
 
 FestivaAI targets the multi-billion-dollar event and celebration ecosystem, supporting three distinct event personas:
@@ -160,7 +167,7 @@ cp .env.example .env.local
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+**Note:** The application is already deployed live at [FestivaAI Live](https://festiva-ai-one.vercel.app/). If you are a developer wishing to run the code locally, use `npm run dev` and open `http://localhost:3000`.
 
 ### 4. Build for Production & Test
 ```bash
