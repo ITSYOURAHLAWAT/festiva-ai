@@ -37,32 +37,32 @@ $$\text{EventPlan} = f(\text{EventType}, \text{GuestCount}, \text{Budget}, \text
 
 ```mermaid
 graph TD
-    User([User / Event Planner]) -->|Step 1: Input Constraints| IntakeForm[Event Intake Form & Presets]
-    IntakeForm -->|Client Validation & XSS Clean| Security[Security & PII Redactor Service]
-    Security -->|Deterministic Hash Check| LocalCache[(localStorage Hash Cache)]
+    User(["User / Event Planner"]) -->|Step 1: Input Constraints| IntakeForm["Event Intake Form & Presets"]
+    IntakeForm -->|Client Validation & XSS Clean| Security["Security & PII Redactor Service"]
+    Security -->|Deterministic Hash Check| LocalCache[("localStorage Hash Cache")]
     
-    LocalCache -->|0ms Cache Hit| Dashboard[Interactive Command Center]
-    LocalCache -->|Cache Miss| ServerAPI[Next.js Server API Routes]
+    LocalCache -->|0ms Cache Hit| Dashboard["Interactive Command Center"]
+    LocalCache -->|Cache Miss| ServerAPI["Next.js Server API Routes"]
     
-    ServerAPI -->|Server Zod Validation| ZodValidate[Zod Schema Validator]
-    ZodValidate -->|GEMINI_API_KEY Configured| Gemini[Google Gemini 1.5 Flash API]
-    ZodValidate -->|No Key / Rate-Limited / Offline| Fallback[Deterministic Fallback Engine]
+    ServerAPI -->|Server Zod Validation| ZodValidate["Zod Schema Validator"]
+    ZodValidate -->|GEMINI_API_KEY Configured| Gemini["Google Gemini 1.5 Flash API"]
+    ZodValidate -->|No Key / Rate-Limited / Offline| Fallback["Deterministic Fallback Engine"]
     
-    Gemini -->|Structured JSON Output| ZodVerify[Zod Output Verification]
+    Gemini -->|Structured JSON Output| ZodVerify["Zod Output Verification"]
     Fallback -->|Guaranteed Structure| ZodVerify
     ZodVerify -->|Full EventPlan JSON| Dashboard
     
-    subgraph "Interactive Command Center (4 Connected Modules)"
-        Dashboard --> Tab1[1. Budget Architect & What-If Stress Tester]
-        Dashboard --> Tab2[2. Reverse Milestone Timeline & Velocity]
-        Dashboard --> Tab3[3. Vendor Tracker, Vetting & AI Negotiator]
-        Dashboard --> Tab4[4. Personalized Vibe Studio & Live AI Co-Pilot]
+    subgraph Modules ["Interactive Command Center Modules"]
+        Dashboard --> Tab1["1. Budget Architect & What-If Stress Tester"]
+        Dashboard --> Tab2["2. Reverse Milestone Timeline & Velocity"]
+        Dashboard --> Tab3["3. Vendor Tracker, Vetting & AI Negotiator"]
+        Dashboard --> Tab4["4. Personalized Vibe Studio & Live AI Co-Pilot"]
     end
     
-    Tab4 -->|Natural Language Command| CoPilotRoute[/api/copilot Handler]
+    Tab4 -->|Natural Language Command| CoPilotRoute["/api/copilot Route Handler"]
     CoPilotRoute -->|Dynamic Plan Patch| Dashboard
     
-    Tab3 -->|1-Click Script Request| NegotiateRoute[/api/negotiation-script Handler]
+    Tab3 -->|1-Click Script Request| NegotiateRoute["/api/negotiation-script Route Handler"]
     NegotiateRoute -->|Tailored Negotiation Letter| Tab3
 ```
 
