@@ -63,6 +63,12 @@ export function CommandCenter({
   const activeBudget = plan?.budget || calculatedBudget;
 
   const [categories, setCategories] = useState<BudgetCategory[]>(activeBudget.categories);
+
+  // Sync categories whenever activeBudget updates (e.g. persona switch or budget changes)
+  useEffect(() => {
+    setCategories(activeBudget.categories);
+  }, [activeBudget.categories]);
+
   const [scriptOpen, setScriptOpen] = useState(false);
   const [selectedVendorForScript, setSelectedVendorForScript] = useState<string | null>(null);
 
@@ -496,6 +502,121 @@ export function CommandCenter({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Dynamic Theme & Cuisine Vibe Showcase Card */}
+      {plan?.vibe && (
+        <section
+          aria-label="Theme, Menu & Vibe Studio Preview"
+          className="rounded-3xl border border-slate-200/70 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/40 space-y-5 transition-all"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/70 pb-4 dark:border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-amber-500 text-white shadow-md">
+                <Sparkles className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-slate-900 dark:text-slate-50">
+                  Theme &amp; Tasting Studio
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Curated {context.culturalTheme} Palette &amp; {context.cuisinePreference} Gastronomy
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300">
+                Palette: {plan.vibe.colorPalette.name}
+              </span>
+            </div>
+          </div>
+
+          {/* Color Swatches Grid */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2.5">
+              Harmonized Palette Swatches ({context.culturalTheme})
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {[
+                { label: 'Primary Tone', hex: plan.vibe.colorPalette.primary },
+                { label: 'Secondary Tone', hex: plan.vibe.colorPalette.secondary },
+                { label: 'Vibrant Accent', hex: plan.vibe.colorPalette.accent },
+                { label: 'Neutral Canvas', hex: plan.vibe.colorPalette.neutral },
+              ].map((swatch, idx) => (
+                <div
+                  key={idx}
+                  className="group rounded-2xl border border-slate-200/80 bg-white/80 p-2.5 shadow-sm dark:border-white/10 dark:bg-white/5 transition-transform hover:scale-[1.02]"
+                >
+                  <div
+                    className="h-12 w-full rounded-xl shadow-inner border border-black/10 dark:border-white/10 mb-2 transition-transform"
+                    style={{ backgroundColor: swatch.hex }}
+                    role="img"
+                    aria-label={`${swatch.label} (${swatch.hex})`}
+                  />
+                  <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate">
+                    {swatch.label}
+                  </p>
+                  <p className="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-500">
+                    {swatch.hex}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Curated Tasting Menu */}
+          <div>
+            <div className="flex items-center justify-between mb-2.5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Curated Tasting Menu ({context.cuisinePreference})
+              </p>
+              <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                {plan.vibe.menuSuggestions.length} Courses Curated
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {plan.vibe.menuSuggestions.map((course, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3.5 space-y-1.5 transition-all"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-serif text-sm font-bold text-slate-900 dark:text-slate-100">
+                      {course.course}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                      Course #{idx + 1}
+                    </span>
+                  </div>
+                  <ul className="space-y-0.5 text-xs text-slate-700 dark:text-slate-300 pl-4 list-disc">
+                    {course.items.map((item, j) => (
+                      <li key={j} className="leading-snug">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-[10px] italic text-amber-700 dark:text-amber-300 pt-1">
+                    ✓ {course.dietaryNotes}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Invitation Prose Preview */}
+          <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-r from-violet-500/5 via-amber-500/5 to-transparent p-4">
+            <div className="flex items-center gap-2 mb-1.5 text-violet-600 dark:text-violet-400">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-xs font-bold uppercase tracking-wider">
+                Tailored Invitation Copy
+              </span>
+            </div>
+            <p className="font-serif text-xs italic text-slate-700 dark:text-slate-300 leading-relaxed">
+              "{plan.vibe.invitationWording}"
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
